@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Local Shop – Fresh Finds, Best Prices</title>
+
+  <!-- Google Fonts: Playfair Display (headings) + DM Sans (body) -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+  <style>
+    /* ===========================
+       CSS CUSTOM PROPERTIES
+    =========================== */
+    :root {
+      --green:      #2d6a4f;
+      --green-light:#40916c;
+      --green-pale: #d8f3dc;
+      --cream:      #fefae0;
+      --amber:      #e9c46a;
+      --rust:       #e76f51;
+      --dark:       #1a1a2e;
+      --text:       #2c2c2c;
+      --muted:      #6b7280;
+      --white:      #ffffff;
+      --radius:     16px;
+      --shadow:     0 8px 32px rgba(45,106,79,.15);
+      --transition: .3s cubic-bezier(.4,0,.2,1);
+    }
+
+    /* ===========================
+       RESET & BASE
+    =========================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+      background: var(--cream);
+      overflow-x: hidden;
+    }
+    img { display: block; width: 100%; object-fit: cover; }
+    button { cursor: pointer; font-family: inherit; }
+    input, textarea { font-family: inherit; }
+
+    /* ===========================
+       STICKY NAVBAR
+    =========================== */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 2rem;
+      background: rgba(254,250,224,.92);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 2px 16px rgba(45,106,79,.08);
+      transition: var(--transition);
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; font-weight: 900;
+      color: var(--green);
+      letter-spacing: -0.5px;
+    }
+    .nav-logo span { color: var(--rust); }
+    .nav-links { display: flex; gap: 1.5rem; list-style: none; }
+    .nav-links a {
+      text-decoration: none; color: var(--text);
+      font-weight: 500; font-size: .95rem;
+      transition: color var(--transition);
+    }
+    .nav-links a:hover { color: var(--green); }
+
+    /* Floating Cart Icon (navbar) */
+    .cart-btn {
+      position: relative;
+      background: var(--green); color: var(--white);
+      border: none; border-radius: 50px;
+      padding: .55rem 1.2rem;
+      font-size: .9rem; font-weight: 600;
+      display: flex; align-items: center; gap: .5rem;
+      transition: background var(--transition), transform var(--transition);
+    }
+    .cart-btn:hover { background: var(--green-light); transform: translateY(-1px); }
+    .cart-count {
+      background: var(--rust); color: #fff;
+      border-radius: 50%; width: 20px; height: 20px;
+      font-size: .7rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ===========================
+       HERO SECTION
+    =========================== */
+    #hero {
+      min-height: 100vh;
+      background:
+        linear-gradient(135deg, rgba(45,106,79,.75) 0%, rgba(26,26,46,.6) 100%),
+        url('https://images.unsplash.com/photo-1542838132-92c53300491e?w=1600&q=80') center/cover no-repeat;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 8rem 2rem 4rem;
+    }
+    .hero-tag {
+      background: var(--amber); color: var(--dark);
+      border-radius: 50px; padding: .3rem 1rem;
+      font-size: .8rem; font-weight: 600; letter-spacing: 1px;
+      text-transform: uppercase; margin-bottom: 1.5rem;
+      animation: fadeUp .7s ease both;
+    }
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      font-weight: 900; color: var(--white);
+      line-height: 1.1; margin-bottom: 1rem;
+      animation: fadeUp .7s .15s ease both;
+    }
+    .hero-title span { color: var(--amber); }
+    .hero-tagline {
+      font-size: 1.2rem; color: rgba(255,255,255,.85);
+      margin-bottom: 2.5rem; font-weight: 300;
+      animation: fadeUp .7s .3s ease both;
+    }
+    .hero-btn {
+      background: var(--rust); color: var(--white);
+      border: none; border-radius: 50px;
+      padding: 1rem 2.5rem; font-size: 1rem; font-weight: 600;
+      letter-spacing: .5px;
+      box-shadow: 0 8px 24px rgba(231,111,81,.4);
+      transition: transform var(--transition), box-shadow var(--transition);
+      animation: fadeUp .7s .45s ease both;
+      text-decoration: none; display: inline-block;
+    }
+    .hero-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(231,111,81,.5);
+    }
+
+    /* ===========================
+       SECTION COMMON
+    =========================== */
+    section { padding: 5rem 2rem; }
+    .section-header { text-align: center; margin-bottom: 3rem; }
+    .section-label {
+      font-size: .8rem; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--green-light);
+      margin-bottom: .6rem;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 900; color: var(--dark);
+    }
+
+    /* ===========================
+       PRODUCTS CAROUSEL
+    =========================== */
+    #products { background: #fff; }
+    .carousel-wrapper { position: relative; }
+
+    /* Arrow buttons */
+    .carousel-arrow {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      z-index: 10; background: var(--white);
+      border: 2px solid var(--green-pale); border-radius: 50%;
+      width: 44px; height: 44px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; color: var(--green);
+      box-shadow: var(--shadow);
+      transition: background var(--transition), color var(--transition);
+    }
+    .carousel-arrow:hover { background: var(--green); color: #fff; }
+    .arrow-left { left: -18px; }
+    .arrow-right { right: -18px; }
+
+    /* Track */
+    .carousel-track {
+      display: flex; gap: 1.5rem;
+      overflow-x: auto; scroll-snap-type: x mandatory;
+      scrollbar-width: none; padding: 1rem .5rem 1.5rem;
+      -webkit-overflow-scrolling: touch;
+    }
+    .carousel-track::-webkit-scrollbar { display: none; }
+
+    /* Product Card */
+    .product-card {
+      flex: 0 0 240px; scroll-snap-align: start;
+      background: var(--cream); border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(45,106,79,.08);
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    .product-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 40px rgba(45,106,79,.18);
+    }
+    .product-img {
+      height: 170px; overflow: hidden;
+    }
+    .product-img img {
+      height: 100%; transition: transform .5s ease;
+    }
+    .product-card:hover .product-img img { transform: scale(1.07); }
+    .product-info { padding: 1.1rem; }
+    .product-name {
+      font-weight: 600; font-size: 1rem;
+      color: var(--dark); margin-bottom: .3rem;
+    }
+    .product-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem; color: var(--green);
+      font-weight: 700; margin-bottom: .9rem;
+    }
+    .add-to-cart {
+      width: 100%; background: var(--green);
+      color: #fff; border: none; border-radius: 50px;
+      padding: .6rem; font-weight: 600; font-size: .88rem;
+      transition: background var(--transition), transform var(--transition);
+    }
+    .add-to-cart:hover { background: var(--green-light); transform: scale(1.02); }
+
+    /* ===========================
+       CART MODAL
+    =========================== */
+    .cart-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.45); z-index: 2000;
+      align-items: flex-start; justify-content: flex-end;
+    }
+    .cart-overlay.open { display: flex; }
+    .cart-panel {
+      width: min(420px, 100%);
+      height: 100vh; background: var(--white);
+      display: flex; flex-direction: column;
+      box-shadow: -8px 0 40px rgba(0,0,0,.2);
+      animation: slideIn .35s ease;
+    }
+    @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    .cart-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.5rem; border-bottom: 1px solid var(--green-pale);
+    }
+    .cart-header h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem; color: var(--dark);
+    }
+    .cart-close {
+      background: var(--green-pale); border: none; border-radius: 50%;
+      width: 36px; height: 36px; font-size: 1.1rem;
+      color: var(--green); transition: background var(--transition);
+    }
+    .cart-close:hover { background: var(--green-pale); color: var(--rust); }
+    .cart-items { flex: 1; overflow-y: auto; padding: 1rem 1.5rem; }
+    .cart-empty {
+      text-align: center; color: var(--muted);
+      padding: 3rem 0;
+    }
+    .cart-empty-icon { font-size: 3rem; margin-bottom: .5rem; }
+    .cart-item {
+      display: flex; align-items: center; gap: 1rem;
+      padding: .9rem 0; border-bottom: 1px solid #f0f0f0;
+    }
+    .cart-item-img {
+      width: 54px; height: 54px; border-radius: 10px;
+      overflow: hidden; flex-shrink: 0;
+    }
+    .cart-item-info { flex: 1; }
+    .cart-item-name { font-weight: 600; font-size: .9rem; }
+    .cart-item-price { color: var(--green); font-weight: 600; font-size: .85rem; }
+    .cart-item-controls {
+      display: flex; align-items: center; gap: .4rem;
+    }
+    .qty-btn {
+      background: var(--green-pale); border: none; border-radius: 50%;
+      width: 26px; height: 26px; font-size: .9rem;
+      color: var(--green); font-weight: 700;
+      transition: background var(--transition);
+    }
+    .qty-btn:hover { background: var(--green); color: #fff; }
+    .qty-display { font-weight: 700; min-width: 20px; text-align: center; }
+    .remove-btn {
+      background: none; border: none; color: var(--rust);
+      font-size: 1rem; padding: .2rem .4rem;
+      transition: color var(--transition);
+    }
+    .remove-btn:hover { color: #c0392b; }
+    .cart-footer {
+      padding: 1.5rem;
+      border-top: 1px solid var(--green-pale);
+    }
+    .cart-total {
+      display: flex; justify-content: space-between;
+      font-size: 1.1rem; font-weight: 700;
+      color: var(--dark); margin-bottom: 1rem;
+    }
+    .checkout-btn {
+      width: 100%; background: var(--rust); color: #fff;
+      border: none; border-radius: 50px; padding: .9rem;
+      font-size: 1rem; font-weight: 700;
+      transition: background var(--transition);
+    }
+    .checkout-btn:hover { background: #c0392b; }
+
+    /* ===========================
+       CHECKOUT SECTION
+    =========================== */
+    #checkout { background: var(--cream); }
+    .checkout-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 2rem; max-width: 900px; margin: 0 auto;
+    }
+    @media (max-width: 680px) { .checkout-grid { grid-template-columns: 1fr; } }
+
+    .form-card, .order-summary-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 2rem;
+      box-shadow: var(--shadow);
+    }
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem; color: var(--dark);
+      margin-bottom: 1.5rem;
+      padding-bottom: .8rem;
+      border-bottom: 2px solid var(--green-pale);
+    }
+    .form-group { margin-bottom: 1.2rem; }
+    .form-group label {
+      display: block; font-weight: 500; font-size: .85rem;
+      color: var(--muted); margin-bottom: .4rem; letter-spacing: .3px;
+    }
+    .form-group input,
+    .form-group textarea {
+      width: 100%; padding: .75rem 1rem;
+      border: 1.5px solid #e5e7eb; border-radius: 10px;
+      font-size: .95rem; color: var(--text);
+      transition: border-color var(--transition), box-shadow var(--transition);
+      outline: none;
+      background: var(--cream);
+    }
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: var(--green-light);
+      box-shadow: 0 0 0 3px rgba(64,145,108,.12);
+    }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+
+    /* Order summary items */
+    .summary-item {
+      display: flex; justify-content: space-between;
+      padding: .5rem 0; border-bottom: 1px dashed #e5e7eb;
+      font-size: .9rem;
+    }
+    .summary-empty { color: var(--muted); text-align: center; padding: 1rem 0; }
+    .summary-total {
+      display: flex; justify-content: space-between;
+      margin-top: 1rem; font-weight: 700;
+      font-size: 1.05rem; color: var(--dark);
+    }
+
+    .place-order-btn {
+      width: 100%; background: var(--green); color: #fff;
+      border: none; border-radius: 50px; padding: 1rem;
+      font-size: 1rem; font-weight: 700; margin-top: 1.5rem;
+      box-shadow: 0 6px 20px rgba(45,106,79,.3);
+      transition: background var(--transition), transform var(--transition);
+    }
+    .place-order-btn:hover {
+      background: var(--green-light);
+      transform: translateY(-2px);
+    }
+    .place-order-btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+    /* ===========================
+       FOOTER
+    =========================== */
+    footer {
+      background: var(--dark); color: rgba(255,255,255,.8);
+      text-align: center; padding: 3rem 2rem;
+    }
+    .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem; font-weight: 900;
+      color: var(--white); margin-bottom: .4rem;
+    }
+    .footer-logo span { color: var(--amber); }
+    .footer-tagline { font-size: .95rem; color: rgba(255,255,255,.55); margin-bottom: 1rem; }
+    .footer-email a {
+      color: var(--amber); text-decoration: none;
+      font-weight: 500; font-size: .9rem;
+      transition: color var(--transition);
+    }
+    .footer-email a:hover { color: var(--white); }
+    .footer-divider { border: none; border-top: 1px solid rgba(255,255,255,.1); margin: 1.5rem 0; }
+    .footer-copy { font-size: .8rem; color: rgba(255,255,255,.35); }
+
+    /* ===========================
+       ANIMATIONS
+    =========================== */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===========================
+       TOAST NOTIFICATION
+    =========================== */
+    .toast {
+      position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: var(--dark); color: #fff;
+      padding: .8rem 2rem; border-radius: 50px;
+      font-weight: 500; z-index: 9999;
+      transition: transform .4s cubic-bezier(.34,1.56,.64,1);
+      box-shadow: 0 8px 24px rgba(0,0,0,.3);
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.success { background: var(--green); }
+    .toast.error   { background: var(--rust); }
+
+    /* ===========================
+       RESPONSIVE NAV
+    =========================== */
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      nav { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===========================
+     STICKY NAVBAR
+=========================== -->
+<nav id="navbar">
+  <div class="nav-logo">The<span>Local</span>Shop</div>
+  <ul class="nav-links">
+    <li><a href="#hero">Home</a></li>
+    <li><a href="#products">Products</a></li>
+    <li><a href="#checkout">Checkout</a></li>
+  </ul>
+  <!-- Cart toggle button -->
+  <button class="cart-btn" onclick="toggleCart()">
+    🛒 Cart <span class="cart-count" id="cartCount">0</span>
+  </button>
+</nav>
+
+
+<!-- ===========================
+     HERO SECTION
+=========================== -->
+<section id="hero">
+  <div class="hero-tag">🌿 Fresh &amp; Local</div>
+  <h1 class="hero-title">Welcome to <span>The Local Shop</span></h1>
+  <p class="hero-tagline">Fresh Finds, Best Prices — Delivered to Your Door</p>
+  <!-- Smooth scrolls to #products -->
+  <a href="#products" class="hero-btn">Shop Now →</a>
+</section>
+
+
+<!-- ===========================
+     PRODUCTS SECTION (Carousel)
+=========================== -->
+<section id="products">
+  <div class="section-header">
+    <p class="section-label">🥦 Today's Fresh Picks</p>
+    <h2 class="section-title">Our Products</h2>
+  </div>
+
+  <div class="carousel-wrapper">
+    <!-- Left arrow -->
+    <button class="carousel-arrow arrow-left" onclick="scrollCarousel(-1)" aria-label="Previous">&#8592;</button>
+
+    <!-- Scrollable product track -->
+    <div class="carousel-track" id="carouselTrack">
+
+      <!-- Product cards are generated by JS below, but here are static backups just in case -->
+      <!-- Products inserted by JavaScript -->
+
+    </div>
+
+    <!-- Right arrow -->
+    <button class="carousel-arrow arrow-right" onclick="scrollCarousel(1)" aria-label="Next">&#8594;</button>
+  </div>
+</section>
+
+
+<!-- ===========================
+     CART MODAL (Side Panel)
+=========================== -->
+<div class="cart-overlay" id="cartOverlay" onclick="handleOverlayClick(event)">
+  <div class="cart-panel">
+    <div class="cart-header">
+      <h3>🛒 Your Cart</h3>
+      <button class="cart-close" onclick="toggleCart()">✕</button>
+    </div>
+    <!-- Cart items render here -->
+    <div class="cart-items" id="cartItems">
+      <div class="cart-empty">
+        <div class="cart-empty-icon">🛍️</div>
+        <p>Your cart is empty!</p>
+      </div>
+    </div>
+    <div class="cart-footer">
+      <div class="cart-total">
+        <span>Total</span>
+        <span id="cartTotal">₹0</span>
+      </div>
+      <button class="checkout-btn" onclick="scrollToCheckout()">Proceed to Checkout →</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===========================
+     CHECKOUT SECTION
+=========================== -->
+<section id="checkout">
+  <div class="section-header">
+    <p class="section-label">📦 Ready to Order?</p>
+    <h2 class="section-title">Checkout</h2>
+  </div>
+
+  <div class="checkout-grid">
+
+    <!-- Left: Customer form -->
+    <div class="form-card">
+      <h3 class="card-title">Delivery Details</h3>
+
+      <div class="form-group">
+        <label for="customerName">Customer Name *</label>
+        <input type="text" id="customerName" placeholder="e.g. Priya Sharma" required />
+      </div>
+
+      <div class="form-group">
+        <label for="phoneNumber">Phone Number *</label>
+        <input type="tel" id="phoneNumber" placeholder="e.g. 9876543210" required />
+      </div>
+
+      <div class="form-group">
+        <label for="deliveryAddress">Delivery Address *</label>
+        <textarea id="deliveryAddress" placeholder="Street, Area, City, Pincode"></textarea>
+      </div>
+
+      <!-- Place Order triggers EmailJS -->
+      <button class="place-order-btn" id="placeOrderBtn" onclick="placeOrder()">
+        Place Order 🚀
+      </button>
+    </div>
+
+    <!-- Right: Live order summary -->
+    <div class="order-summary-card">
+      <h3 class="card-title">Order Summary</h3>
+      <div id="summaryItems">
+        <p class="summary-empty">Add items to your cart to see your order here.</p>
+      </div>
+      <div class="summary-total" id="summaryTotal" style="display:none;">
+        <span>Total</span>
+        <span id="summaryTotalAmount">₹0</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ===========================
+     FOOTER
+=========================== -->
+<footer>
+  <div class="footer-logo">The<span>Local</span>Shop</div>
+  <p class="footer-tagline">Fresh Finds, Best Prices</p>
+  <p class="footer-email">📧 <a href="/cdn-cgi/l/email-protection#6c0301070d1e000d070d0809585d2c0b010d0500420f0301"><span class="__cf_email__" data-cfemail="afc0c2c4ceddc3cec4cecbca9b9eefc8c2cec6c381ccc0c2">[email&#160;protected]</span></a></p>
+  <hr class="footer-divider" />
+  <p class="footer-copy">&copy; 2025 The Local Shop. Made with ❤️ for local communities.</p>
+</footer>
+
+<!-- Toast notification -->
+<div class="toast" id="toast"></div>
+
+
+<!-- ===========================
+     JAVASCRIPT
+=========================== -->
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  // ─────────────────────────────────────────────
+  // 1. PRODUCT DATA
+  // ─────────────────────────────────────────────
+  const products = [
+    {
+      id: 1,
+      name: "Fresh Apples",
+      price: 120,
+      image: "https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?w=400&q=80",
+      emoji: "🍎"
+    },
+    {
+      id: 2,
+      name: "Bananas",
+      price: 60,
+      image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=400&q=80",
+      emoji: "🍌"
+    },
+    {
+      id: 3,
+      name: "Milk",
+      price: 50,
+      image: "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=400&q=80",
+      emoji: "🥛"
+    },
+    {
+      id: 4,
+      name: "Bread",
+      price: 40,
+      image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&q=80",
+      emoji: "🍞"
+    },
+    {
+      id: 5,
+      name: "Eggs",
+      price: 90,
+      image: "https://images.unsplash.com/photo-1587486913049-53fc88980cfc?w=400&q=80",
+      emoji: "🥚"
+    },
+    {
+      id: 6,
+      name: "Rice",
+      price: 80,
+      image: "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400&q=80",
+      emoji: "🍚"
+    }
+  ];
+
+  // ─────────────────────────────────────────────
+  // 2. CART STATE
+  // ─────────────────────────────────────────────
+  let cart = []; // Array of { id, name, price, image, qty }
+
+  // ─────────────────────────────────────────────
+  // 3. RENDER PRODUCT CAROUSEL
+  // ─────────────────────────────────────────────
+  function renderProducts() {
+    const track = document.getElementById("carouselTrack");
+    track.innerHTML = products.map(p => `
+      <div class="product-card">
+        <div class="product-img">
+          <img src="${p.image}" alt="${p.name}" loading="lazy" />
+        </div>
+        <div class="product-info">
+          <p class="product-name">${p.emoji} ${p.name}</p>
+          <p class="product-price">₹${p.price}</p>
+          <button class="add-to-cart" onclick="addToCart(${p.id})">
+            + Add to Cart
+          </button>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  // ─────────────────────────────────────────────
+  // 4. CAROUSEL SCROLL (arrow buttons)
+  // ─────────────────────────────────────────────
+  function scrollCarousel(direction) {
+    const track = document.getElementById("carouselTrack");
+    track.scrollBy({ left: direction * 280, behavior: "smooth" });
+  }
+
+  // ─────────────────────────────────────────────
+  // 5. CART LOGIC
+  // ─────────────────────────────────────────────
+
+  // Add product to cart (or increase qty if already there)
+  function addToCart(productId) {
+    const product = products.find(p => p.id === productId);
+    const existing = cart.find(item => item.id === productId);
+
+    if (existing) {
+      existing.qty += 1;
+    } else {
+      cart.push({ ...product, qty: 1 });
+    }
+
+    updateCartUI();
+    showToast(`${product.emoji} ${product.name} added to cart!`);
+  }
+
+  // Increase quantity of a cart item
+  function increaseQty(productId) {
+    const item = cart.find(i => i.id === productId);
+    if (item) item.qty += 1;
+    updateCartUI();
+  }
+
+  // Decrease quantity; removes if qty reaches 0
+  function decreaseQty(productId) {
+    const item = cart.find(i => i.id === productId);
+    if (!item) return;
+    item.qty -= 1;
+    if (item.qty <= 0) {
+      cart = cart.filter(i => i.id !== productId);
+    }
+    updateCartUI();
+  }
+
+  // Remove item entirely from cart
+  function removeItem(productId) {
+    cart = cart.filter(i => i.id !== productId);
+    updateCartUI();
+  }
+
+  // Calculate total price
+  function getTotal() {
+    return cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+  }
+
+  // ─────────────────────────────────────────────
+  // 6. UPDATE ALL CART UI (panel + count + summary)
+  // ─────────────────────────────────────────────
+  function updateCartUI() {
+    const total = getTotal();
+    const itemCount = cart.reduce((sum, i) => sum + i.qty, 0);
+
+    // Navbar badge
+    document.getElementById("cartCount").textContent = itemCount;
+
+    // Cart panel items
+    const cartItemsEl = document.getElementById("cartItems");
+    if (cart.length === 0) {
+      cartItemsEl.innerHTML = `
+        <div class="cart-empty">
+          <div class="cart-empty-icon">🛍️</div>
+          <p>Your cart is empty!</p>
+        </div>`;
+    } else {
+      cartItemsEl.innerHTML = cart.map(item => `
+        <div class="cart-item">
+          <div class="cart-item-img">
+            <img src="${item.image}" alt="${item.name}" />
+          </div>
+          <div class="cart-item-info">
+            <p class="cart-item-name">${item.emoji} ${item.name}</p>
+            <p class="cart-item-price">₹${item.price} × ${item.qty} = ₹${item.price * item.qty}</p>
+          </div>
+          <div class="cart-item-controls">
+            <button class="qty-btn" onclick="decreaseQty(${item.id})">−</button>
+            <span class="qty-display">${item.qty}</span>
+            <button class="qty-btn" onclick="increaseQty(${item.id})">+</button>
+            <button class="remove-btn" onclick="removeItem(${item.id})">🗑</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    // Cart footer total
+    document.getElementById("cartTotal").textContent = `₹${total}`;
+
+    // Order summary (checkout section)
+    updateOrderSummary(total);
+  }
+
+  // ─────────────────────────────────────────────
+  // 7. ORDER SUMMARY (checkout section)
+  // ─────────────────────────────────────────────
+  function updateOrderSummary(total) {
+    const summaryItems = document.getElementById("summaryItems");
+    const summaryTotal = document.getElementById("summaryTotal");
+    const summaryTotalAmount = document.getElementById("summaryTotalAmount");
+
+    if (cart.length === 0) {
+      summaryItems.innerHTML = `<p class="summary-empty">Add items to your cart to see your order here.</p>`;
+      summaryTotal.style.display = "none";
+    } else {
+      summaryItems.innerHTML = cart.map(item => `
+        <div class="summary-item">
+          <span>${item.emoji} ${item.name} × ${item.qty}</span>
+          <span>₹${item.price * item.qty}</span>
+        </div>
+      `).join("");
+      summaryTotalAmount.textContent = `₹${total}`;
+      summaryTotal.style.display = "flex";
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // 8. CART TOGGLE (open / close)
+  // ─────────────────────────────────────────────
+  function toggleCart() {
+    const overlay = document.getElementById("cartOverlay");
+    overlay.classList.toggle("open");
+  }
+
+  // Close cart when clicking the dark overlay (outside panel)
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById("cartOverlay")) {
+      toggleCart();
+    }
+  }
+
+  // Smooth scroll to checkout and close cart
+  function scrollToCheckout() {
+    toggleCart();
+    document.getElementById("checkout").scrollIntoView({ behavior: "smooth" });
+  }
+
+  // ─────────────────────────────────────────────
+  // 9. EMAILJS INITIALIZATION
+  // ─────────────────────────────────────────────
+  // Initialize EmailJS with your PUBLIC key only (never use private key)
+  emailjs.init("avdo7MQuKchWvgnBN");
+
+  // ─────────────────────────────────────────────
+  // 10. PLACE ORDER (EmailJS send)
+  // ─────────────────────────────────────────────
+  function placeOrder() {
+    // Get form values
+    const name    = document.getElementById("customerName").value.trim();
+    const phone   = document.getElementById("phoneNumber").value.trim();
+    const address = document.getElementById("deliveryAddress").value.trim();
+
+    // Basic validation
+    if (!name || !phone || !address) {
+      showToast("Please fill in all delivery details!", "error");
+      return;
+    }
+    if (cart.length === 0) {
+      showToast("Your cart is empty! Add some items first.", "error");
+      return;
+    }
+
+    // Build the order summary message
+    const itemLines = cart.map(item =>
+      `${item.name} x${item.qty} - ₹${item.price * item.qty}`
+    ).join("\n");
+
+    const orderSummary = `
+New Order Received
+
+Customer Name: ${name}
+Phone: ${phone}
+Address: ${address}
+
+Items:
+${itemLines}
+
+Total: ₹${getTotal()}
+    `.trim();
+
+    // Disable button to prevent double-click
+    const btn = document.getElementById("placeOrderBtn");
+    btn.disabled = true;
+    btn.textContent = "Sending... ⏳";
+
+    // Send via EmailJS
+    emailjs.send("service_nlgqkzj", "template_ntpm2hf", {
+      from_name: name,
+      phone:     phone,
+      message:   orderSummary
+    })
+    .then(() => {
+      // ✅ Success
+      showToast("Order sent successfully! 🎉", "success");
+      clearCart();
+      resetForm();
+    })
+    .catch((err) => {
+      // ❌ Error
+      console.error("EmailJS error:", err);
+      showToast("Failed to send order. Please try again.", "error");
+    })
+    .finally(() => {
+      btn.disabled = false;
+      btn.textContent = "Place Order 🚀";
+    });
+  }
+
+  // ─────────────────────────────────────────────
+  // 11. POST-ORDER CLEANUP
+  // ─────────────────────────────────────────────
+
+  // Clear all items from cart
+  function clearCart() {
+    cart = [];
+    updateCartUI();
+  }
+
+  // Reset the checkout form fields
+  function resetForm() {
+    document.getElementById("customerName").value   = "";
+    document.getElementById("phoneNumber").value    = "";
+    document.getElementById("deliveryAddress").value = "";
+  }
+
+  // ─────────────────────────────────────────────
+  // 12. TOAST NOTIFICATION HELPER
+  // ─────────────────────────────────────────────
+  let toastTimer = null;
+  function showToast(message, type = "") {
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.className = `toast show ${type}`;
+
+    // Clear previous timer to avoid overlap
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      toast.classList.remove("show");
+    }, 3000);
+  }
+
+  // ─────────────────────────────────────────────
+  // 13. INIT
+  // ────────────────────────�
